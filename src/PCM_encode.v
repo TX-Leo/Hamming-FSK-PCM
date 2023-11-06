@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module PCMcode(
+module PCM_encode(
     input clkAD,
     input reset,
     input [7:0] datain,
