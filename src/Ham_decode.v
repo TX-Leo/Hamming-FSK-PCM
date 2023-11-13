@@ -44,6 +44,15 @@ begin
         PCMcode[7:4] <= {ham_code[13:11],~ham_code[10]};
     end
 
+    // no error
+    if (s1 == 3'b000') begin
+        PCMcode[3:0] <= {ham_code[6:3]};
+    end
+    if (s2 == 3'b000') begin
+        PCMcode[7:4] <= {ham_code[13:10]};
+    end
+
+
 end
 
 
