@@ -21,6 +21,7 @@ wire [13:0] ham_code_encoded;
 wire fsk;
 wire [13:0] ham_code_decoded;
 wire [7:0] PCMcode_decoded;
+wire [7:0] datain;
 
 FreDivisions FreDivisions1(
     .clk(clk), 

@@ -3,7 +3,7 @@
 module create_data(
     input clk_character_rate,
     input reset,
-    output [7:0] datain,
+    output reg [7:0] datain
 );
 
 always @(posedge clk_character_rate or posedge reset)
@@ -12,7 +12,7 @@ begin
         datain <= 8'b0; 
     end
     else begin
-        datain <= 8'b01010101;
+        datain <= 8'b10101010;
     end
 end
 
