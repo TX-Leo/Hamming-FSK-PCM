@@ -1,56 +1,58 @@
+`timescale 1ns / 1ps
+
 module FSK_demodulate(
     input reset,
-    input fsk_signal, //fsk´ý½âµ÷ÐÅºÅ
-    input clk_serialAD,//bitËÙÂÊ
+    input fsk_signal, //fskï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½
+    input clk_bitTransferRate,//bitï¿½ï¿½ï¿½ï¿½
     output reg [13:0] Hamcode
 );
 
-reg [13:0] dataout_recoding; // ²¢ÐÐÊä³ö»º³åÆ÷
-reg [3:0] k; // ÒÑ¾­½ÓÊÜµÄbitÊý
-reg flag;  //0-´ò¿ª´®²¢×ª»»
-reg [2:0] j; // FSKÐÅºÅµÄÂö³å¼ÆÊýÆ÷
+reg [13:0] dataout_recoding; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+reg [3:0] serialSignalCount_ctr; // ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½Üµï¿½bitï¿½ï¿½
+reg serialConversion_flag;  //0-ï¿½ò¿ª´ï¿½ï¿½ï¿½×ªï¿½ï¿½
+reg [2:0] pulseCount_ctr; // FSKï¿½ÅºÅµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 always @(posedge fsk_signal or posedge reset)
 begin
     if (reset) begin
-        k <= 3'd13; // ³õÊ¼»¯ k Îª13£¬j ºÍ flag Îª 0
-        flag <= 1'b0;
-        j <= 3'b000;
+        serialSignalCount_ctr <= 4'd13; // ï¿½ï¿½Ê¼ï¿½ï¿½ serialSignalCount_ctr Îª13ï¿½ï¿½pulseCount_ctr ï¿½ï¿½ serialConversion_flag Îª 0
+        serialConversion_flag <= 1'b0;
+        pulseCount_ctr <= 3'b000;
     end
     else begin
-        if (clk_serialAD) begin // ÔÚ clk_serialAD µÄ¸ßµçÆ½Ê±½øÐÐ¼ÆÊý
-            // flag = 1
-            if (flag) begin
-                // »º³åÆ÷½ÓÊÜ13¸ö¾Í²¢ÐÐÊä³ö
-                if (k == 3'd13) begin
-                    k <= 3'b000;
+        if (clk_bitTransferRate) begin // ï¿½clk_bitTransferRateAD ï¿½Ä¸ßµï¿½Æ½Ê±ï¿½ï¿½ï¿½Ð¼ï¿½ï¿½ï¿½
+            // serialConversion_flag = 1
+            if (serialConversion_flag) begin
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½13ï¿½ï¿½ï¿½Í²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                if (serialSignalCount_ctr == 4'd13) begin
+                    serialSignalCount_ctr <= 4'd0;
                 end
-                // ²»µ½¼ÌÐø
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 else begin
-                    k <= k + 1;
+                    serialSignalCount_ctr <= serialSignalCount_ctr + 1;
                 end
             end
-            // Âö³å¼ÆÊý
-            j <= j + 1;
-            flag <= 1'b0;
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            pulseCount_ctr <= pulseCount_ctr + 1;
+            serialConversion_flag <= 1'b0;
         end
-        else begin // ÔÚµÍµçÆ½Ê±Ö»½øÐÐÅÐ¶Ï
-            if (j > 3) begin
-                if (!flag) begin
-                    dataout_recoding[k] <= 1'b1; // Èç¹ûÊÕµ½µÄ¹ýÁãÊý´óÓÚ4ÔòÅÐ¶ÏÎªÊÕµ½µÄÊÇ1ÐÅºÅ
-                    flag <= 1'b1; // ±íÊ¾ÊÕµ½ÐÅºÅ£¬µ«Ã»ÓÐÊÕÆëÒ»×é9¸ö£¬Òò´Ë²»²¢ÐÐÊä³ö
+        else begin // ï¿½ÚµÍµï¿½Æ½Ê±Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
+            if (pulseCount_ctr > 3) begin
+                if (!serialConversion_flag) begin
+                    dataout_recoding[serialSignalCount_ctr] <= 1'b1; // ï¿½ï¿½ï¿½ï¿½Õµï¿½ï¿½Ä¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½Ð¶ï¿½Îªï¿½Õµï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½Åºï¿½
+                    serialConversion_flag <= 1'b1; // ï¿½ï¿½Ê¾ï¿½Õµï¿½ï¿½ÅºÅ£ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½9ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 end
             end
             else begin
-                if (!flag) begin
-                    dataout_recoding[k] <= 1'b0; // Èç¹ûÊÕµ½µÄ¹ýÁãÊýÐ¡ÓÚ4ÔòÅÐ¶ÏÎªÊÕµ½µÄÊÇ0ÐÅºÅ
-                    flag <= 1'b1;
+                if (!serialConversion_flag) begin
+                    dataout_recoding[serialSignalCount_ctr] <= 1'b0; // ï¿½ï¿½ï¿½ï¿½Õµï¿½ï¿½Ä¹ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½4ï¿½ï¿½ï¿½Ð¶ï¿½Îªï¿½Õµï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½Åºï¿½
+                    serialConversion_flag <= 1'b1;
                 end
             end
-            j <= 3'b000;
+            pulseCount_ctr <= 3'b000;
         end
         // the component for recoding
-        if (k == 3'b000) begin // µ±ÊÕÆëÁËÒ»×é13¸öÐÅºÅ£¬½øÐÐ²¢ÐÐÊä³ö
+        if (serialSignalCount_ctr == 4'd0) begin // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½13ï¿½ï¿½ï¿½ÅºÅ£ï¿½ï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             Hamcode <= dataout_recoding[13:0]; 
         end
     end

@@ -1,38 +1,51 @@
 `timescale 1ns / 1ps
 
 module PCM_encode(
-    input clkAD,
+    input clk_character_rate,
     input reset,
     input [7:0] datain,
     output reg [7:0] PCMout
 );
 reg [12:0] readytopcm;
 
-always @(posedge clkAD or posedge reset)
+always @(posedge clk_character_rate or posedge reset)
 begin
     if (reset) begin
-        readytopcm <= 13'b0; // ¸´Î»Ê±£¬Êä³öÎª0
+        readytopcm <= 13'b0; // ï¿½ï¿½Î»Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Îª0
         PCMout <= 8'b0;
     end
     else begin
-        readytopcm[12:5] <= datain[7:0]; // ½«¶ÁÈëµÄ8Î»Êý¾Ý·Åµ½ÏßÐÔPCMµÄÇ°8Î»
-        readytopcm[4:0] <= 5'b00000; // ºó5Î»¸½0
+        readytopcm[12:5] <= datain[7:0]; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½8Î»ï¿½ï¿½ï¿½Ý·Åµï¿½ï¿½ï¿½ï¿½ï¿½PCMï¿½ï¿½Ç°8Î»
+        readytopcm[4:0] <= 5'b00000; // ï¿½ï¿½5Î»ï¿½ï¿½0
     end
 end
 
 always @(*)
 begin
-    case (readytopcm[11:5])
-        7'b0000000: PCMout <= {readytopcm[12], 3'b000, readytopcm[4:1]};
-        7'b0000001: PCMout <= {readytopcm[12], 3'b001, readytopcm[4:1]};
-        7'b000001x: PCMout <= {readytopcm[12], 3'b010, readytopcm[5:2]};
-        7'b00001xx: PCMout <= {readytopcm[12], 3'b011, readytopcm[6:3]};
-        7'b0001xxx: PCMout <= {readytopcm[12], 3'b100, readytopcm[7:4]};
-        7'b001xxxx: PCMout <= {readytopcm[12], 3'b101, readytopcm[8:5]};
-        7'b01xxxxx: PCMout <= {readytopcm[12], 3'b110, readytopcm[9:6]};
-        7'b1xxxxxx: PCMout <= {readytopcm[12], 3'b111, readytopcm[10:7]};
-        default: PCMout <= 8'b0; // Ä¬ÈÏÇé¿ö
-    endcase
+    if(readytopcm[11:5] == 7'b0000000) begin
+        PCMout <= {readytopcm[12], 3'b000, readytopcm[4:1]};
+    end
+    if(readytopcm[11:5] == 7'b0000001) begin
+        PCMout <= {readytopcm[12], 3'b001, readytopcm[4:1]};
+    end
+    if(readytopcm[11:6] == 6'b000001) begin
+        PCMout <= {readytopcm[12], 3'b010, readytopcm[5:2]};
+    end
+    if(readytopcm[11:7] == 5'b00001) begin
+        PCMout <= {readytopcm[12], 3'b011, readytopcm[6:3]};
+    end
+    if(readytopcm[11:8] == 4'b0001) begin
+        PCMout <= {readytopcm[12], 3'b100, readytopcm[7:4]};
+    end
+    if(readytopcm[11:9] == 3'b001) begin
+        PCMout <= {readytopcm[12], 3'b101, readytopcm[8:5]};
+    end
+    if(readytopcm[11:10] == 2'b01) begin
+        PCMout <= {readytopcm[12], 3'b110, readytopcm[9:6]};
+    end
+    if(readytopcm[11] == 1'b1) begin
+        PCMout <= {readytopcm[12], 3'b111, readytopcm[10:7]};
+    end
 end
 
 endmodule

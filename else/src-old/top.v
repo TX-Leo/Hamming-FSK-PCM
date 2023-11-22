@@ -7,66 +7,52 @@ module top(
     output [7:0] PCMout
 );
 
-wire clkIn;
-wire clk_bitTransferRate;
-wire FSK_clk;
-wire [3:0] counter2;
-wire clkforAD;
-wire [4:0] counter_serialAD;
-wire [8:0] counterforAD;
-wire clk_character_rate;
-wire [7:0] counterAD;
-wire [7:0] PCMcode_encoded;
-wire [13:0] ham_code_encoded;
-wire fsk;
-wire [13:0] ham_code_decoded;
-wire [7:0] PCMcode_decoded;
 
-FreDivisions FreDivisions1(
+
+FreDivision(
     .clk(clk), 
     .reset(reset),
     .clkout(clkIn)
 );
-Multi_fredivision Multi_fredivision1(
+Multi_fredivision(
     .clkIn(clkIn),
     .reset(reset),
-    .clk_bitTransferRate(clk_bitTransferRate), 
-    .FSK_clk(FSK_clk),
+    .clk_serialAD(clk_serialAD), 
+    .clk2(clk2),
     .counter2(counter2),
     .clkforAD(clkforAD),
     .counter_serialAD(counter_serialAD),
     .counterforAD(counterforAD),
-    .clk_character_rate(clk_character_rate), 
+    .clkAD(clkAD), 
     .counterAD(counterAD)
 );
-PCM_encode PCM_encode1(
-    .clk_character_rate(clk_character_rate),
+PCM_encode(
+    .clkAD(clkAD),
     .reset(reset),
     .datain(datain),
     .PCMout(PCMcode_encoded)
 );
-Ham_encode Ham_encode1(
+Ham_encode(
     .PCMcode(PCMcode_encoded),
     .ham_code(ham_code_encoded)
 );
-FSK_modulate FSK_modulate1(
-    .FSK_clk(FSK_clk),
+FSK_modulate(
+    .clk2(clk2),
     .Hamcode(ham_code_encoded),
     .reset(reset),
     .fsk(fsk)
 );
-
-FSK_demodulate FSK_demodulate1(
+FSK_demodulate(
     .reset(reset),
     .fsk_signal(fsk), 
-    .clk_bitTransferRate(clk_bitTransferRate),
+    .clk_serialAD(clk_serialAD),
     .Hamcode(ham_code_decoded)
 );
-Ham_decode Ham_decode1(
+Ham_decode(
     .ham_code(ham_code_decoded),
     .PCMcode(PCMcode_decoded)
-);
-PCM_decode PCM_decode1(
+)
+PCM_decode(
     .datain(PCMcode_decoded),
     .PCMout(PCMout)
 );

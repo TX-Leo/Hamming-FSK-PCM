@@ -60,15 +60,10 @@ begin
                 linearoutput[10:7] <= datain[3:0];
                 linearoutput[6:0] <= 7'b1000000;
             end
-        default: 
-                begin
-                linearoutput[11] <= 1'b1;
-                linearoutput[10:7] <= datain[3:0];
-                linearoutput[6:0] <= 7'b1000000;
-            end
+        default: null;
     endcase
 end
 
-assign PCMout[7:0] = linearoutput[12:5];
+assign PCMout[7:0]=linearoutput[12:5];
 
 endmodule
