@@ -3,8 +3,8 @@
 module top(
     input reset,
     input clk,
-    input [7:0] datain,
     output [7:0] PCMout
+    //input [7:0] datain
 );
 
 wire clkIn;
@@ -39,6 +39,11 @@ Multi_fredivision Multi_fredivision1(
     .clk_character_rate(clk_character_rate), 
     .counterAD(counterAD)
 );
+create_data create_data1(
+    .clk_character_rate(clk_character_rate),
+    .reset(reset),
+    .datain(datain)
+);
 PCM_encode PCM_encode1(
     .clk_character_rate(clk_character_rate),
     .reset(reset),
@@ -55,7 +60,6 @@ FSK_modulate FSK_modulate1(
     .reset(reset),
     .fsk(fsk)
 );
-
 FSK_demodulate FSK_demodulate1(
     .reset(reset),
     .fsk_signal(fsk), 
