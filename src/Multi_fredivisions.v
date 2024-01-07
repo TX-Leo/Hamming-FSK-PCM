@@ -3,48 +3,49 @@
 module Multi_fredivision(
     input clkIn,
     input reset,
-    output reg clk_serialAD, //×Ö·ûËÙÂÊ
-    output reg clk2,
+    output reg clk_bitTransferRate, //ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½
+    output reg FSK_clk,
     output reg [3:0] counter2,
     output reg clkforAD,
     output reg [4:0] counter_serialAD, //32fre
     output reg [8:0] counterforAD,
-    output reg clkAD, //448fre
-    output reg [7:0] counterAD //±ÈÌØËÙÂÊ
+    output reg clk_character_rate, //448fre
+    output reg [7:0] counterAD //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 );
 
 always @(posedge clkIn or posedge reset)
 begin
     if (reset) begin
-        clk_serialAD <= 1'b0;
-        clk2 <= 1'b0;
+        clk_bitTransferRate <= 1'b0;
+        FSK_clk <= 1'b0;
         counter2 <= 4'b0;
         clkforAD <= 1'b0;
         counter_serialAD <= 5'b0;
         counterforAD <= 9'b0;
         counterAD <= 8'b0;
+        clk_character_rate <= 1'b0;
     end
     else begin
         if (clkIn) begin
-            clk2 <= ~clk2; // 2·ÖÆµµÃµ½Ô¼15.625MHzµÄclk2
+            FSK_clk <= ~FSK_clk; // 2ï¿½ï¿½Æµï¿½Ãµï¿½Ô¼15.625MHzï¿½ï¿½FSK_clk
             
-            if (counter_serialAD == 4'b1111) begin // 32·ÖÆµµÃµ½Ô¼976.6kHzµÄclk_serialAD
+            if (counter_serialAD == 4'b1111) begin // 32ï¿½ï¿½Æµï¿½Ãµï¿½Ô¼976.6kHzï¿½ï¿½clk_bitTransferRate
                 counter_serialAD <= 5'b0;
-                clk_serialAD <= ~clk_serialAD;
+                clk_bitTransferRate <= ~clk_bitTransferRate;
             end
             else begin
                 counter_serialAD <= counter_serialAD + 1;
             end
 
-            if (counterAD == 8'd223) begin // 32*14=448·ÖÆµµÃµ½Ô¼69.75kHzµÄclkAD
+            if (counterAD == 8'd223) begin // 32*14=448ï¿½ï¿½Æµï¿½Ãµï¿½Ô¼69clk_character_ratezï¿½ï¿½clkAD
                 counterAD <= 8'b0;
-                clkAD <= ~clkAD;
+                clk_character_rate <= ~clk_character_rate;
             end
             else begin
                 counterAD <= counterAD + 1;
             end
 
-            if (counterforAD == 9'b10111) begin // 48·ÖÆµµÃµ½651kHzµÄADÊ±ÖÓĞÅºÅ
+            if (counterforAD == 9'b10111) begin // 48ï¿½ï¿½Æµï¿½Ãµï¿½651kHzï¿½ï¿½ADÊ±ï¿½ï¿½ï¿½Åºï¿½
                 counterforAD <= 9'b0;
                 clkforAD <= ~clkforAD;
             end
